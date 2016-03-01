@@ -3,6 +3,8 @@ package com.callcentre.employee;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.callcentre.controller.Call;
+
 public class Employee {
 	public static final String RESPONDENT = "Respondent"; 
 	public static final String MANAGER = "Manager"; 
@@ -15,16 +17,17 @@ public class Employee {
 	public Employee(String name, String purpose) {
 		mCallerName = name;
 		mPurpose = purpose;
-		initMap();
+		//initMap();
 	}
 	
-	private void initMap() {
+	public static void initMap() {
+	    System.out.println("init map");
 		hm.put(RESPONDENT, true);
 		hm.put(MANAGER, true);
 		hm.put(DIRECTOR, true);		
 	}
 	
-	public void takingCall() {
+	public void takingCall(Call call) {
 		
 	}
 	

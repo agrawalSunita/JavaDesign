@@ -9,18 +9,30 @@ import com.callcentre.employee.Respondent;
 
 public class DispatchFactoryCall {
 	private static Map<String,Boolean> map;
+	private static boolean isBusy = false;
 	
 	public static Employee dispatchCall(Call call) {
+	    isBusy = false;
 		map = Employee.getMap();
 		Boolean key = map.get(Employee.RESPONDENT);
 		if(key == null || map.get(Employee.RESPONDENT)) {
-			return new Respondent(call);
+			return Respondent.getResInstance(call);
 		} else if(map.get(Employee.MANAGER)) {
-			return new Manager(call);
+			return Manager.getManInstance(call);
 		} else if(map.get(Employee.DIRECTOR)) {
-			return new Director(call);
+			return Director.getDirInstance(call);
+		} else {
+		    isBusy = true;
 		}
 		return null;
+	}
+	
+	public static boolean isBusy(){
+	    return isBusy;
+	}
+	
+	public static void setBusyStatus(boolean busy) {
+	    isBusy = busy;
 	}
 
 }

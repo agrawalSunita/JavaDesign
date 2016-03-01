@@ -5,62 +5,62 @@ import java.util.Queue;
 
 import com.callcentre.employee.Employee;
 
-public class Controller implements Runnable{
-	
-	private static Controller sInstance;
-	private Queue<Call> mCallQueue = new LinkedList<Call>();
-	
-	private Controller() {
-		
-	}
-	
-	public static Controller getInstance() {
-		if(sInstance == null) {
-			synchronized (Controller.class) {
-				if(sInstance == null) {
-					sInstance = new Controller();
-				}
-			}
-		}
-		return sInstance;
-	}
-	
-	public void callFromCust(String name, String purpose) {
-		Call call = new Call(name,purpose);		
-		mCallQueue.add(call);
-		processCall();
-	}
-	
-	
-	private void processCall() {
-		while(mCallQueue.size() > 0) {
-			Call call = mCallQueue.poll();
-			Employee emp = DispatchFactoryCall.dispatchCall(call);
-			if(emp!= null) {
-				emp.takingCall();
-			}
-		}
-		
-	}
+public class Controller implements Runnable {
 
-	@Override
-	public void run() {
-		while(mCallQueue.size() > 0) {
-			synchronized (mCallQueue) {
-				Call call = null;
-				try {
-					call = mCallQueue.;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-	}
-	
-	
-	
-	
-	
+    private static Controller sInstance;
+    private Queue<Call> mCallQueue = new LinkedList<Call>();
+    private Employee emp;
+    private Object obj = new Object();
+
+    private Controller() {
+        Employee.initMap();
+    }
+
+    public static Controller getInstance() {
+        if (sInstance == null) {
+            synchronized (Controller.class) {
+                if (sInstance == null) {
+                    sInstance = new Controller();
+                }
+            }
+        }
+        return sInstance;
+    }
+
+    public void callFromCust(String name, String purpose) {
+        Call call = new Call(name, purpose);
+        mCallQueue.add(call);
+        processCall();
+    }
+
+    private void processCall() {
+        if (mCallQueue.size() > 0) {
+            new Thread(this).start();
+        }
+    }
+
+    public void notifyStatus() {
+        DispatchFactoryCall.setBusyStatus(false);
+        processCall();
+    }
+
+    @Override
+    public void run() {
+
+        synchronized (obj) {
+            Call call = mCallQueue.peek();
+            if (call != null) {
+                emp = DispatchFactoryCall.dispatchCall(call);
+                if (emp != null && !DispatchFactoryCall.isBusy()) {
+                    mCallQueue.remove();
+                    emp.takingCall(call);
+                } else {
+                    System.out.println("all are busy, waiting for turn");
+                }
+            }
+
+        }
+
+    }
 
 }
